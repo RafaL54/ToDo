@@ -72,14 +72,25 @@
 </template>
 
 <script setup>
-// TODO Etap 1 — dopracowanie
-// [ ] 1. Usuwanie pojedynczego zadania (nie tylko "Usuń zaznaczone")
-// [ ] 2. Edycja treści zadania (dwuklik -> input -> Enter/blur zapisuje)
-// [ ] 3. Przycinanie (trim) tytułu zadania przed zapisem, nie tylko w warunku
-// [ ] 4. Podział na komponenty: TaskItem.vue, TaskInput.vue, TaskList.vue
-// [ ] 5. Zamiana elementów na Nuxt UI (UButton, UInput, UCheckbox, UCard) w każdym komponencie
+/*
+ * Instrukcja — Trello
+ * ===================
+ * Zaproszenie do tablicy w Trello wysłałem na maila. Na liście "Today"
+ * znajdziesz 4 zadania do zrobienia, każde z opisem co trzeba zrobić.
+ *
+ * Workflow dla każdego zadania:
+ * 1. Każda karta ma pole "Branch" / "Gałąź" — to nazwa gałęzi, którą
+ *    zakładasz w gicie dla tego zadania.
+ * 2. Zaczynasz pracę:
+ *    - przypisz siebie do karty (+ Members), jeśli jeszcze nie jesteś przypisany
+ *    - przenieś kartę do listy "In Progress"
+ * 3. Kończysz pracę:
+ *    - zrób pull request z tej gałęzi do main i zmerguj go
+ *    - przenieś kartę do listy "Ready to Test"
+ *    - przypnij mnie do karty i odepnij siebie
+ */
 
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue"; // <-- tego nie musisz importować w Nuxt
 
 const newTask = ref("");
 const tasks = ref([]);
