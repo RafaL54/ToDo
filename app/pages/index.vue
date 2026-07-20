@@ -38,8 +38,8 @@
           <input
             type="checkbox"
             :checked="task.completed"
-            @change="toggleTask(task)"
             class="accent-green-500 w-3 h-3"
+            @change="toggleTask(task)"
           />
 
           <span
@@ -72,6 +72,13 @@
 </template>
 
 <script setup>
+// TODO Etap 1 — dopracowanie
+// [ ] 1. Usuwanie pojedynczego zadania (nie tylko "Usuń zaznaczone")
+// [ ] 2. Edycja treści zadania (dwuklik -> input -> Enter/blur zapisuje)
+// [ ] 3. Przycinanie (trim) tytułu zadania przed zapisem, nie tylko w warunku
+// [ ] 4. Podział na komponenty: TaskItem.vue, TaskInput.vue, TaskList.vue
+// [ ] 5. Zamiana elementów na Nuxt UI (UButton, UInput, UCheckbox, UCard) w każdym komponencie
+
 import { ref, computed, onMounted, watch } from "vue";
 
 const newTask = ref("");
