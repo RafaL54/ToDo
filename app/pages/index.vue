@@ -33,22 +33,32 @@
         <div
           v-for="task in tasks"
           :key="task.id"
-          class="flex items-center gap-3 border-b py-3"
+          class="flex items-center justify-between w-full gap-3 border-b py-3"
         >
-          <input
-            type="checkbox"
-            :checked="task.completed"
-            @change="toggleTask(task)"
-            class="accent-green-500 w-3 h-3"
-          />
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              :checked="task.completed"
+              @change="toggleTask(task)"
+              class="accent-green-500 w-3 h-3"
+            />
 
-          <span
-            :class="{
-              'line-through text-gray-400': task.completed,
-            }"
-          >
-            {{ task.title }}
-          </span>
+            <span
+              :class="{
+                'line-through text-gray-400': task.completed,
+              }"
+            >
+              {{ task.title }}
+            </span>
+          </div>
+          <div v-if="task.completed">
+            <button
+              class="bg-red-500 text-white px-2 py-1 rounded"
+              @click="removeTask(task)"
+            >
+              Usuń
+            </button>
+          </div>
         </div>
 
         <div v-if="hasCompleted" class="mt-5">
@@ -110,6 +120,10 @@ function addTask() {
 
 function toggleTask(task) {
   task.completed = !task.completed;
+}
+
+function removeTask(task) {
+  tasks.value = tasks.value.filter((item) => item.id !== task.id);
 }
 
 function removeCompleted() {
