@@ -82,7 +82,25 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+/*
+ * Instrukcja — Trello
+ * ===================
+ * Zaproszenie do tablicy w Trello wysłałem na maila. Na liście "Today"
+ * znajdziesz 4 zadania do zrobienia, każde z opisem co trzeba zrobić.
+ *
+ * Workflow dla każdego zadania:
+ * 1. Każda karta ma pole "Branch" / "Gałąź" — to nazwa gałęzi, którą
+ *    zakładasz w gicie dla tego zadania.
+ * 2. Zaczynasz pracę:
+ *    - przypisz siebie do karty (+ Members), jeśli jeszcze nie jesteś przypisany
+ *    - przenieś kartę do listy "In Progress"
+ * 3. Kończysz pracę:
+ *    - zrób pull request z tej gałęzi do main i zmerguj go
+ *    - przenieś kartę do listy "Ready to Test"
+ *    - przypnij mnie do karty i odepnij siebie
+ */
+
+import { ref, computed, onMounted, watch } from "vue"; // <-- tego nie musisz importować w Nuxt
 
 const newTask = ref("");
 const tasks = ref([]);
