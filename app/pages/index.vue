@@ -3,9 +3,7 @@
     <div class="mx-auto max-w-xl">
       <div class="border rounded-lg p-6 shadow bg-gray-50">
         <div class="flex items-center justify-between mb-6">
-          <h1 class="text-2xl font-bold">
-            Moja lista zadań
-          </h1>
+          <h1 class="text-2xl font-bold">Moja lista zadań</h1>
 
           <span
             v-if="remainingCount"
@@ -21,20 +19,14 @@
             class="flex-1 border rounded px-3 py-2 bg-white"
             placeholder="Dodaj zadanie..."
             @keyup.enter="addTask"
-          >
+          />
 
-          <button
-            class="bg-green-500 text-white px-4 rounded"
-            @click="addTask"
-          >
+          <button class="bg-green-500 text-white px-4 rounded" @click="addTask">
             Dodaj
           </button>
         </div>
 
-        <div
-          v-if="tasks.length === 0"
-          class="text-center text-gray-500 py-5"
-        >
+        <div v-if="tasks.length === 0" class="text-center text-gray-500 py-5">
           Brak zadań
         </div>
 
@@ -49,11 +41,22 @@
               :checked="task.completed"
               class="accent-green-500 w-3 h-3"
               @change="toggleTask(task)"
-            >
+            />
+
+            <input
+              v-if="task.id === editingTaskId"
+              class="border rounded px-2 py-1 w-full bg-white"
+              v-model="editTitle"
+              @keyup.enter="saveEdit(task)"
+              @blur="saveEdit(task)"
+              @keyup.esc="cancelEdit"
+            />
 
             <span
+              v-else
+              @dblclick="edit(task)"
               :class="{
-                'line-through text-gray-400': task.completed
+                'line-through text-gray-400': task.completed,
               }"
             >
               {{ task.title }}
@@ -69,10 +72,7 @@
           </div>
         </div>
 
-        <div
-          v-if="hasCompleted"
-          class="mt-5"
-        >
+        <div v-if="hasCompleted" class="mt-5">
           <button
             class="bg-red-500 text-white px-4 py-2 rounded"
             @click="removeCompleted"
@@ -111,67 +111,89 @@
  *    - przypnij mnie do karty i odepnij siebie
  */
 
-import { ref, computed, onMounted, watch } from 'vue' // <-- tego nie musisz importować w Nuxt
+import { ref, computed, onMounted, watch } from "vue"; // <-- tego nie musisz importować w Nuxt
 
-const newTask = ref('')
-const tasks = ref([])
+const newTask = ref("");
+const tasks = ref([]);
+const editingTaskId = ref(null);
+const editTitle = ref("");
+const cancelingEdit = ref(false);
 
 const completedCount = computed(
-  () => tasks.value.filter(task => task.completed).length
-)
+  () => tasks.value.filter((task) => task.completed).length,
+);
 
 const remainingCount = computed(
-  () => tasks.value.filter(task => !task.completed).length
-)
+  () => tasks.value.filter((task) => !task.completed).length,
+);
 
-const hasCompleted = computed(() => tasks.value.some(task => task.completed))
+const hasCompleted = computed(() => tasks.value.some((task) => task.completed));
 
 const badgeClass = computed(() => {
-  const count = remainingCount.value
+  const count = remainingCount.value;
 
-  if (count <= 2) return 'bg-green-500'
-  if (count <= 5) return 'bg-yellow-500'
+  if (count <= 2) return "bg-green-500";
+  if (count <= 5) return "bg-yellow-500";
 
-  return 'bg-red-500 animate-pulse'
-})
+  return "bg-red-500 animate-pulse";
+});
 
 function addTask() {
-  if (newTask.value.trim() === '') return
+  if (newTask.value.trim() === "") return;
 
   tasks.value.push({
     id: Date.now(),
     title: newTask.value,
-    completed: false
-  })
+    completed: false,
+  });
 
-  newTask.value = ''
+  newTask.value = "";
 }
 
 function toggleTask(task) {
-  task.completed = !task.completed
+  task.completed = !task.completed;
 }
 
 function removeTask(task) {
-  tasks.value = tasks.value.filter(item => item.id !== task.id)
+  tasks.value = tasks.value.filter((item) => item.id !== task.id);
 }
 
 function removeCompleted() {
-  tasks.value = tasks.value.filter(task => !task.completed)
+  tasks.value = tasks.value.filter((task) => !task.completed);
+}
+
+function edit(task) {
+  editingTaskId.value = task.id;
+  editTitle.value = task.title;
+}
+
+function saveEdit(task) {
+  if (cancelingEdit.value) {
+    cancelingEdit.value = false;
+    return;
+  }
+  task.title = editTitle.value;
+  editingTaskId.value = null;
+}
+
+function cancelEdit() {
+  cancelingEdit.value = true;
+  editingTaskId.value = null;
 }
 
 onMounted(() => {
-  const saved = localStorage.getItem('tasks')
+  const saved = localStorage.getItem("tasks");
 
   if (saved) {
-    tasks.value = JSON.parse(saved)
+    tasks.value = JSON.parse(saved);
   }
-})
+});
 
 watch(
   tasks,
   () => {
-    localStorage.setItem('tasks', JSON.stringify(tasks.value))
+    localStorage.setItem("tasks", JSON.stringify(tasks.value));
   },
-  { deep: true }
-)
+  { deep: true },
+);
 </script>
