@@ -51,10 +51,21 @@
               @change="toggleTask(task)"
             >
 
+            <input
+              v-if="task.id === editingTaskId"
+              v-model="editTitle"
+              class="border rounded px-2 py-1 w-full bg-white"
+              @keyup.enter="saveEdit(task)"
+              @blur="saveEdit(task)"
+              @keyup.esc="cancelEdit"
+            >
+
             <span
+              v-else
               :class="{
                 'line-through text-gray-400': task.completed
               }"
+              @dblclick="edit(task)"
             >
               {{ task.title }}
             </span>
@@ -115,6 +126,9 @@ import { ref, computed, onMounted, watch } from 'vue' // <-- tego nie musisz imp
 
 const newTask = ref('')
 const tasks = ref([])
+const editingTaskId = ref(null)
+const editTitle = ref('')
+const cancelingEdit = ref(false)
 
 const completedCount = computed(
   () => tasks.value.filter(task => task.completed).length
@@ -157,6 +171,25 @@ function removeTask(task) {
 
 function removeCompleted() {
   tasks.value = tasks.value.filter(task => !task.completed)
+}
+
+function edit(task) {
+  editingTaskId.value = task.id
+  editTitle.value = task.title
+}
+
+function saveEdit(task) {
+  if (cancelingEdit.value) {
+    cancelingEdit.value = false
+    return
+  }
+  task.title = editTitle.value
+  editingTaskId.value = null
+}
+
+function cancelEdit() {
+  cancelingEdit.value = true
+  editingTaskId.value = null
 }
 
 onMounted(() => {
