@@ -154,7 +154,7 @@ function addTask() {
 
   tasks.value.push({
     id: Date.now(),
-    title: newTask.value,
+    title: newTask.value.trim(),
     completed: false
   })
 
