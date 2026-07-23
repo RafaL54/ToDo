@@ -1,57 +1,55 @@
 <template>
-<div class="flex items-center justify-between w-full gap-3 border-b py-3"
-        >
-          <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              :checked="task.completed"
-              class="accent-green-500 w-3 h-3"
-              @change="$emit('toggle', task)"
-            >
+  <div class="flex items-center justify-between w-full gap-3 border-b py-3">
+    <div class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        :checked="task.completed"
+        class="accent-green-500 w-3 h-3"
+        @change="$emit('toggle', task)"
+      >
 
-            <input
-              v-if="editing"
-              v-model="editTitle"
-              class="border rounded px-2 py-1 w-full bg-white"
-              @keyup.enter="saveEdit(task)"
-              @blur="saveEdit(task)"
-              @keyup.esc="cancelEdit"
-            >
+      <input
+        v-if="editing"
+        v-model="editTitle"
+        class="border rounded px-2 py-1 w-full bg-white"
+        @keyup.enter="saveEdit(task)"
+        @blur="saveEdit(task)"
+        @keyup.esc="cancelEdit"
+      >
 
-            <span
-              v-else
-              :class="{
-                'line-through text-gray-400': task.completed
-              }"
-              @dblclick="edit(task)"
-            >
-              {{ task.title }}
-            </span>
-          </div>
-          <div v-if="task.completed">
-            <button
-              class="bg-red-500 text-white px-2 py-1 rounded"
-              @click="$emit('remove', task)"
-            >
-              Usuń
-            </button>
-          </div>
-		</div>
+      <span
+        v-else
+        :class="{
+          'line-through text-gray-400': task.completed
+        }"
+        @dblclick="edit(task)"
+      >
+        {{ task.title }}
+      </span>
+    </div>
+    <div v-if="task.completed">
+      <button
+        class="bg-red-500 text-white px-2 py-1 rounded"
+        @click="$emit('remove', task)"
+      >
+        Usuń
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup>
-
 const editing = ref(false)
 const editTitle = ref('')
 const cancelingEdit = ref(false)
 
 defineEmits([
-	'toggle', 
-	'remove'
+  'toggle',
+  'remove'
 ])
 
 defineProps({
-	task: Object	
+  task: Object
 })
 
 function edit(task) {
@@ -60,7 +58,6 @@ function edit(task) {
 }
 
 function saveEdit(task) {
-
   if (cancelingEdit.value) {
     cancelingEdit.value = false
     return
@@ -70,9 +67,7 @@ function saveEdit(task) {
 }
 
 function cancelEdit() {
-
   cancelingEdit.value = true
   editing.value = false
 }
-
 </script>

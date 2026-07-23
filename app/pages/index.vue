@@ -15,16 +15,16 @@
           </span>
         </div>
 
-   <TaskInput 
-    @add="addTask" 
-   />
+        <TaskInput
+          @add="addTask"
+        />
 
-   <TaskList
-    :tasks="tasks"
-    @toggle="toggleTask"
-    @remove="removeTask"
-   />     
-        
+        <TaskList
+          :tasks="tasks"
+          @toggle="toggleTask"
+          @remove="removeTask"
+        />
+
         <div
           v-if="hasCompleted"
           class="mt-5"
@@ -49,60 +49,59 @@
 </template>
 
 <script setup>
-
 const tasks = ref([])
 
 const completedCount = computed(
-	() => tasks.value.filter(task => task.completed).length
+  () => tasks.value.filter(task => task.completed).length
 )
 const remainingCount = computed(
-	() => tasks.value.filter(task => !task.completed).length
+  () => tasks.value.filter(task => !task.completed).length
 )
 const hasCompleted = computed(() => tasks.value.some(task => task.completed))
 
 const badgeClass = computed(() => {
-	const count = remainingCount.value
-	
-	if (count <= 2) return 'bg-green-500'
-	if (count <= 5) return 'bg-yellow-500'
-	
-	return 'bg-red-500 animate-pulse'
+  const count = remainingCount.value
+
+  if (count <= 2) return 'bg-green-500'
+  if (count <= 5) return 'bg-yellow-500'
+
+  return 'bg-red-500 animate-pulse'
 })
 
 function addTask(title) {
-	tasks.value.push({
-		id: Date.now(),
-		title,
-		completed: false
-	})
+  tasks.value.push({
+    id: Date.now(),
+    title,
+    completed: false
+  })
 }
 
 function toggleTask(task) {
-	task.completed = !task.completed
+  task.completed = !task.completed
 }
 
 function removeTask(task) {
-	tasks.value = tasks.value.filter(item => item.id !== task.id)
+  tasks.value = tasks.value.filter(item => item.id !== task.id)
 }
 
 function removeCompleted() {
-	tasks.value = tasks.value.filter(task => !task.completed)
+  tasks.value = tasks.value.filter(task => !task.completed)
 }
 
 onMounted(() => {
-	const saved = localStorage.getItem('tasks')
-	
-	if (saved) {
-		tasks.value = JSON.parse(saved)
-	}
+  const saved = localStorage.getItem('tasks')
+
+  if (saved) {
+    tasks.value = JSON.parse(saved)
+  }
 })
 
 watch(
-	tasks,
-	() => {
-		localStorage.setItem('tasks', JSON.stringify(tasks.value))
-	},
-	{ deep: true }
+  tasks,
+  () => {
+    localStorage.setItem('tasks', JSON.stringify(tasks.value))
+  },
+  { deep: true }
 )
 </script>
 
