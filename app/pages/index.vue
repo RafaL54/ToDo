@@ -15,70 +15,15 @@
           </span>
         </div>
 
-        <div class="flex gap-2 mb-6">
-          <input
-            v-model="newTask"
-            class="flex-1 border rounded px-3 py-2 bg-white"
-            placeholder="Dodaj zadanie..."
-            @keyup.enter="addTask"
-          >
+        <TaskInput
+          @add="addTask"
+        />
 
-          <button
-            class="bg-green-500 text-white px-4 rounded"
-            @click="addTask"
-          >
-            Dodaj
-          </button>
-        </div>
-
-        <div
-          v-if="tasks.length === 0"
-          class="text-center text-gray-500 py-5"
-        >
-          Brak zadań
-        </div>
-
-        <div
-          v-for="task in tasks"
-          :key="task.id"
-          class="flex items-center justify-between w-full gap-3 border-b py-3"
-        >
-          <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              :checked="task.completed"
-              class="accent-green-500 w-3 h-3"
-              @change="toggleTask(task)"
-            >
-
-            <input
-              v-if="task.id === editingTaskId"
-              v-model="editTitle"
-              class="border rounded px-2 py-1 w-full bg-white"
-              @keyup.enter="saveEdit(task)"
-              @blur="saveEdit(task)"
-              @keyup.esc="cancelEdit"
-            >
-
-            <span
-              v-else
-              :class="{
-                'line-through text-gray-400': task.completed
-              }"
-              @dblclick="edit(task)"
-            >
-              {{ task.title }}
-            </span>
-          </div>
-          <div v-if="task.completed">
-            <button
-              class="bg-red-500 text-white px-2 py-1 rounded"
-              @click="removeTask(task)"
-            >
-              Usuń
-            </button>
-          </div>
-        </div>
+        <TaskList
+          :tasks="tasks"
+          @toggle="toggleTask"
+          @remove="removeTask"
+        />
 
         <div
           v-if="hasCompleted"
@@ -104,40 +49,14 @@
 </template>
 
 <script setup>
-/*
- * Instrukcja — Trello
- * ===================
- * Zaproszenie do tablicy w Trello wysłałem na maila. Na liście "Today"
- * znajdziesz 4 zadania do zrobienia, każde z opisem co trzeba zrobić.
- *
- * Workflow dla każdego zadania:
- * 1. Każda karta ma pole "Branch" / "Gałąź" — to nazwa gałęzi, którą
- *    zakładasz w gicie dla tego zadania.
- * 2. Zaczynasz pracę:
- *    - przypisz siebie do karty (+ Members), jeśli jeszcze nie jesteś przypisany
- *    - przenieś kartę do listy "In Progress"
- * 3. Kończysz pracę:
- *    - zrób pull request z tej gałęzi do main i zmerguj go
- *    - przenieś kartę do listy "Ready to Test"
- *    - przypnij mnie do karty i odepnij siebie
- */
-
-import { ref, computed, onMounted, watch } from 'vue' // <-- tego nie musisz importować w Nuxt
-
-const newTask = ref('')
 const tasks = ref([])
-const editingTaskId = ref(null)
-const editTitle = ref('')
-const cancelingEdit = ref(false)
 
 const completedCount = computed(
   () => tasks.value.filter(task => task.completed).length
 )
-
 const remainingCount = computed(
   () => tasks.value.filter(task => !task.completed).length
 )
-
 const hasCompleted = computed(() => tasks.value.some(task => task.completed))
 
 const badgeClass = computed(() => {
@@ -149,16 +68,12 @@ const badgeClass = computed(() => {
   return 'bg-red-500 animate-pulse'
 })
 
-function addTask() {
-  if (newTask.value.trim() === '') return
-
+function addTask(title) {
   tasks.value.push({
     id: Date.now(),
-    title: newTask.value.trim(),
+    title,
     completed: false
   })
-
-  newTask.value = ''
 }
 
 function toggleTask(task) {
@@ -171,25 +86,6 @@ function removeTask(task) {
 
 function removeCompleted() {
   tasks.value = tasks.value.filter(task => !task.completed)
-}
-
-function edit(task) {
-  editingTaskId.value = task.id
-  editTitle.value = task.title
-}
-
-function saveEdit(task) {
-  if (cancelingEdit.value) {
-    cancelingEdit.value = false
-    return
-  }
-  task.title = editTitle.value
-  editingTaskId.value = null
-}
-
-function cancelEdit() {
-  cancelingEdit.value = true
-  editingTaskId.value = null
 }
 
 onMounted(() => {
@@ -208,3 +104,21 @@ watch(
   { deep: true }
 )
 </script>
+
+/*
+* Instrukcja — Trello
+* ===================
+* Zaproszenie do tablicy w Trello wysłałem na maila. Na liście "Today"
+* znajdziesz 4 zadania do zrobienia, każde z opisem co trzeba zrobić.
+*
+* Workflow dla każdego zadania:
+* 1. Każda karta ma pole "Branch" / "Gałąź" — to nazwa gałęzi, którą
+*    zakładasz w gicie dla tego zadania.
+* 2. Zaczynasz pracę:
+*    - przypisz siebie do karty (+ Members), jeśli jeszcze nie jesteś przypisany
+*    - przenieś kartę do listy "In Progress"
+* 3. Kończysz pracę:
+*    - zrób pull request z tej gałęzi do main i zmerguj go
+*    - przenieś kartę do listy "Ready to Test"
+*    - przypnij mnie do karty i odepnij siebie
+*/
