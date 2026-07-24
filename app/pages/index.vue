@@ -19,8 +19,25 @@
           @add="addTask"
         />
 
+		<div class="flex gap-3 mb-5">
+  <select
+    class="border rounded px-2 py-2 bg-white cursor-pointer"
+    v-model="filter"
+  >
+    <option value="all">Wszystkie</option>
+    <option value="active">Aktywne</option>
+    <option value="completed">Ukończone</option>
+  </select>
+
+  <input
+    v-model="searchQuery"
+    placeholder="Szukaj zadania..."
+    class="flex-1 border rounded px-3 py-2 bg-white"
+  >
+</div>
+
         <TaskList
-          :tasks="tasks"
+          :tasks="filteredTasks"
           @toggle="toggleTask"
           @remove="removeTask"
         />
@@ -30,7 +47,7 @@
           class="mt-5"
         >
           <button
-            class="bg-red-500 text-white px-4 py-2 rounded"
+            class="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
             @click="removeCompleted"
           >
             Usuń zaznaczone
@@ -50,6 +67,8 @@
 
 <script setup>
 const tasks = ref([])
+const filter = ref('all')
+const searchQuery = ref('')
 
 const completedCount = computed(
   () => tasks.value.filter(task => task.completed).length
@@ -66,6 +85,26 @@ const badgeClass = computed(() => {
   if (count <= 5) return 'bg-yellow-500'
 
   return 'bg-red-500 animate-pulse'
+})
+
+const filteredTasks = computed(() => {
+  let result = tasks.value
+
+  if (filter.value === 'active') {
+    result = result.filter(task => !task.completed)
+  }
+
+  if (filter.value === 'completed') {
+    result = result.filter(task => task.completed)
+  }
+
+  if (searchQuery.value) {
+    result = result.filter(task =>
+      task.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
+  return result
 })
 
 function addTask(title) {

@@ -4,7 +4,7 @@
       <input
         type="checkbox"
         :checked="task.completed"
-        class="accent-green-500 w-3 h-3"
+        class="accent-green-500 w-3 h-3 cursor-pointer"
         @change="$emit('toggle', task)"
       >
 
@@ -29,7 +29,7 @@
     </div>
     <div v-if="task.completed">
       <button
-        class="bg-red-500 text-white px-2 py-1 rounded"
+        class="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
         @click="$emit('remove', task)"
       >
         Usuń

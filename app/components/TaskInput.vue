@@ -8,7 +8,7 @@
     >
 
     <button
-      class="bg-green-500 text-white px-4 rounded"
+      class="bg-green-500 text-white px-4 rounded cursor-pointer"
       @click="addTask"
     >
       Dodaj
