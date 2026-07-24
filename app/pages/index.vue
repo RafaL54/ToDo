@@ -19,22 +19,28 @@
           @add="addTask"
         />
 
-		<div class="flex gap-3 mb-5">
-  <select
-    class="border rounded px-2 py-2 bg-white cursor-pointer"
-    v-model="filter"
-  >
-    <option value="all">Wszystkie</option>
-    <option value="active">Aktywne</option>
-    <option value="completed">Ukończone</option>
-  </select>
+        <div class="flex gap-3 mb-5">
+          <select
+            v-model="filter"
+            class="border rounded px-2 py-2 bg-white cursor-pointer"
+          >
+            <option value="all">
+              Wszystkie
+            </option>
+            <option value="active">
+              Aktywne
+            </option>
+            <option value="completed">
+              Ukończone
+            </option>
+          </select>
 
-  <input
-    v-model="searchQuery"
-    placeholder="Szukaj zadania..."
-    class="flex-1 border rounded px-3 py-2 bg-white"
-  >
-</div>
+          <input
+            v-model="searchQuery"
+            placeholder="Szukaj zadania..."
+            class="flex-1 border rounded px-3 py-2 bg-white"
+          >
+        </div>
 
         <TaskList
           :tasks="filteredTasks"
