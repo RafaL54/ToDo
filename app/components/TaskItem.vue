@@ -28,12 +28,11 @@
       </span>
     </div>
     <div v-if="task.completed">
-      <button
-        class="bg-red-500 text-white px-2 py-1 rounded cursor-pointer"
+      <UButton
+        icon="i-lucide-trash-2"
+        class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
         @click="$emit('remove', task)"
-      >
-        Usuń
-      </button>
+      />
     </div>
   </div>
 </template>
