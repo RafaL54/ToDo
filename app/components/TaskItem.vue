@@ -29,11 +29,10 @@
     </div>
     <div v-if="task.completed">
       <UButton
-	    icon="i-lucide-trash-2"
+        icon="i-lucide-trash-2"
         class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
         @click="$emit('remove', task)"
-      >
-      </UButton>
+      />
     </div>
   </div>
 </template>
