@@ -46,6 +46,10 @@
             <option value="date">
               Data
             </option>
+
+            <option value="status">
+              Status
+            </option>
           </select>
 
           <input
@@ -144,6 +148,12 @@ const filteredTasks = computed(() => {
       if (!b.dueDate) return -1
 
       return new Date(a.dueDate) - new Date(b.dueDate)
+    })
+  }
+
+  if (sort.value === 'status') {
+    result = [...result].sort((a, b) => {
+      return a.completed - b.completed
     })
   }
 

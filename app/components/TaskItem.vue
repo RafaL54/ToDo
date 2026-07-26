@@ -5,7 +5,7 @@
         type="checkbox"
         :checked="task.completed"
         class="accent-green-500 w-3 h-3 cursor-pointer"
-        @change="emit('toggle', task)"
+        @change="$emit('toggle', task)"
       >
 
       <div>
@@ -16,6 +16,13 @@
           @keyup.enter="saveEdit(task)"
           @blur="saveEdit(task)"
           @keyup.esc="cancelEdit"
+        >
+
+        <input
+          v-if="editing"
+          v-model="editDate"
+          type="date"
+          class="border rounded px-2 py-1 bg-white mt-1"
         >
 
         <span
@@ -30,7 +37,7 @@
 
         <div
           v-if="task.dueDate"
-          class="text-xs"
+          class="text-xs text-gray-500"
           :class="{
             'text-red-500': isOverdue,
             'text-gray-500': !isOverdue
@@ -45,7 +52,7 @@
       <UButton
         icon="i-lucide-trash-2"
         class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
-        @click="emit('remove', task)"
+        @click="$emit('remove', task)"
       />
     </div>
   </div>
@@ -54,9 +61,10 @@
 <script setup>
 const editing = ref(false)
 const editTitle = ref('')
+const editDate = ref('')
 const cancelingEdit = ref(false)
 
-const emit = defineEmits([
+defineEmits([
   'toggle',
   'remove'
 ])
@@ -80,6 +88,7 @@ const isOverdue = computed(() => {
 function edit(task) {
   editing.value = true
   editTitle.value = task.title
+  editDate.value = task.dueDate || ''
 }
 
 function saveEdit(task) {
@@ -89,6 +98,8 @@ function saveEdit(task) {
   }
 
   task.title = editTitle.value
+  task.dueDate = editDate.value || null
+
   editing.value = false
 }
 
