@@ -8,25 +8,46 @@
         @change="$emit('toggle', task)"
       >
 
-      <input
-        v-if="editing"
-        v-model="editTitle"
-        class="border rounded px-2 py-1 w-full bg-white"
-        @keyup.enter="saveEdit(task)"
-        @blur="saveEdit(task)"
-        @keyup.esc="cancelEdit"
-      >
+      <div>
+        <input
+          v-if="editing"
+          v-model="editTitle"
+          class="border rounded px-2 py-1 w-full bg-white"
+          @keyup.enter="saveEdit(task)"
+          @blur="saveEdit(task)"
+          @keyup.esc="cancelEdit"
+        >
 
-      <span
-        v-else
-        :class="{
-          'line-through text-gray-400': task.completed
-        }"
-        @dblclick="edit(task)"
-      >
-        {{ task.title }}
-      </span>
+        <input
+          v-if="editing"
+          v-model="editDate"
+          type="date"
+          class="border rounded px-2 py-1 bg-white mt-1"
+        >
+
+        <span
+          v-else
+          :class="{
+            'line-through text-gray-400': task.completed
+          }"
+          @dblclick="edit(task)"
+        >
+          {{ task.title }}
+        </span>
+
+        <div
+          v-if="task.dueDate"
+          class="text-xs text-gray-500"
+          :class="{
+            'text-red-500': isOverdue,
+            'text-gray-500': !isOverdue
+          }"
+        >
+          Termin: {{ task.dueDate }}
+        </div>
+      </div>
     </div>
+
     <div v-if="task.completed">
       <UButton
         icon="i-lucide-trash-2"
@@ -40,6 +61,7 @@
 <script setup>
 const editing = ref(false)
 const editTitle = ref('')
+const editDate = ref('')
 const cancelingEdit = ref(false)
 
 defineEmits([
@@ -47,13 +69,26 @@ defineEmits([
   'remove'
 ])
 
-defineProps({
+const props = defineProps({
   task: Object
+})
+
+const isOverdue = computed(() => {
+  if (!props.task.dueDate) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const dueDate = new Date(props.task.dueDate)
+  dueDate.setHours(0, 0, 0, 0)
+
+  return dueDate < today
 })
 
 function edit(task) {
   editing.value = true
   editTitle.value = task.title
+  editDate.value = task.dueDate || ''
 }
 
 function saveEdit(task) {
@@ -61,7 +96,10 @@ function saveEdit(task) {
     cancelingEdit.value = false
     return
   }
+
   task.title = editTitle.value
+  task.dueDate = editDate.value || null
+
   editing.value = false
 }
 
