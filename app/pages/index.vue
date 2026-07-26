@@ -35,6 +35,19 @@
             </option>
           </select>
 
+          <select
+            v-model="sort"
+            class="border rounded px-2 py-2 bg-white cursor-pointer"
+          >
+            <option value="none">
+              Bez sortowania
+            </option>
+
+            <option value="date">
+              Data
+            </option>
+          </select>
+
           <input
             v-model="searchQuery"
             placeholder="Szukaj zadania..."
@@ -87,13 +100,16 @@
 const tasks = ref([])
 const filter = ref('all')
 const searchQuery = ref('')
+const sort = ref('none')
 
 const completedCount = computed(
   () => tasks.value.filter(task => task.completed).length
 )
+
 const remainingCount = computed(
   () => tasks.value.filter(task => !task.completed).length
 )
+
 const hasCompleted = computed(() => tasks.value.some(task => task.completed))
 
 const badgeClass = computed(() => {
@@ -122,6 +138,15 @@ const filteredTasks = computed(() => {
     )
   }
 
+  if (sort.value === 'date') {
+    result = [...result].sort((a, b) => {
+      if (!a.dueDate) return 1
+      if (!b.dueDate) return -1
+
+      return new Date(a.dueDate) - new Date(b.dueDate)
+    })
+  }
+
   return result
 })
 
@@ -148,18 +173,26 @@ function removeCompleted() {
 
 function removeAllTasks() {
   const confirmDelete = confirm(
-    'Czy na pewno chcesz usunąc wszystkie zadania?'
+    'Czy na pewno chcesz usunąć wszystkie zadania?'
   )
+
   if (confirmDelete) {
     tasks.value = []
   }
 }
 
 onMounted(() => {
-  const saved = localStorage.getItem('tasks')
+  const savedTasks = localStorage.getItem('tasks')
+  const savedSort = localStorage.getItem('sort')
 
-  if (saved) {
-    tasks.value = JSON.parse(saved)
+  console.log('Pobrano:', savedTasks)
+
+  if (savedTasks) {
+    tasks.value = JSON.parse(savedTasks)
+  }
+
+  if (savedSort) {
+    sort.value = savedSort
   }
 })
 
@@ -169,6 +202,13 @@ watch(
     localStorage.setItem('tasks', JSON.stringify(tasks.value))
   },
   { deep: true }
+)
+
+watch(
+  sort,
+  () => {
+    localStorage.setItem('sort', sort.value)
+  }
 )
 </script>
 

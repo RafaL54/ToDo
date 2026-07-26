@@ -5,33 +5,47 @@
         type="checkbox"
         :checked="task.completed"
         class="accent-green-500 w-3 h-3 cursor-pointer"
-        @change="$emit('toggle', task)"
+        @change="emit('toggle', task)"
       >
 
-      <input
-        v-if="editing"
-        v-model="editTitle"
-        class="border rounded px-2 py-1 w-full bg-white"
-        @keyup.enter="saveEdit(task)"
-        @blur="saveEdit(task)"
-        @keyup.esc="cancelEdit"
-      >
+      <div>
+        <input
+          v-if="editing"
+          v-model="editTitle"
+          class="border rounded px-2 py-1 w-full bg-white"
+          @keyup.enter="saveEdit(task)"
+          @blur="saveEdit(task)"
+          @keyup.esc="cancelEdit"
+        >
 
-      <span
-        v-else
-        :class="{
-          'line-through text-gray-400': task.completed
-        }"
-        @dblclick="edit(task)"
-      >
-        {{ task.title }}
-      </span>
+        <span
+          v-else
+          :class="{
+            'line-through text-gray-400': task.completed
+          }"
+          @dblclick="edit(task)"
+        >
+          {{ task.title }}
+        </span>
+
+        <div
+          v-if="task.dueDate"
+          class="text-xs"
+          :class="{
+            'text-red-500': isOverdue,
+            'text-gray-500': !isOverdue
+          }"
+        >
+          Termin: {{ task.dueDate }}
+        </div>
+      </div>
     </div>
+
     <div v-if="task.completed">
       <UButton
         icon="i-lucide-trash-2"
         class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
-        @click="$emit('remove', task)"
+        @click="emit('remove', task)"
       />
     </div>
   </div>
@@ -42,13 +56,25 @@ const editing = ref(false)
 const editTitle = ref('')
 const cancelingEdit = ref(false)
 
-defineEmits([
+const emit = defineEmits([
   'toggle',
   'remove'
 ])
 
-defineProps({
+const props = defineProps({
   task: Object
+})
+
+const isOverdue = computed(() => {
+  if (!props.task.dueDate) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const dueDate = new Date(props.task.dueDate)
+  dueDate.setHours(0, 0, 0, 0)
+
+  return dueDate < today
 })
 
 function edit(task) {
@@ -61,6 +87,7 @@ function saveEdit(task) {
     cancelingEdit.value = false
     return
   }
+
   task.title = editTitle.value
   editing.value = false
 }
