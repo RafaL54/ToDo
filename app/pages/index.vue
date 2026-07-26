@@ -125,11 +125,12 @@ const filteredTasks = computed(() => {
   return result
 })
 
-function addTask(title) {
+function addTask(task) {
   tasks.value.push({
     id: Date.now(),
-    title,
-    completed: false
+    title: task.title,
+    completed: false,
+    dueDate: task.dueDate
   })
 }
 
