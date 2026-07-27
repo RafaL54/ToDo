@@ -15,6 +15,7 @@
       @toggle="emit('toggle', $event)"
       @remove="emit('remove', $event)"
       @edit="emit('edit', $event)"
+      @editing-change="emit('editing-change', $event)"
     />
   </div>
 </template>
@@ -23,7 +24,8 @@
 const emit = defineEmits([
   'toggle',
   'remove',
-  'edit'
+  'edit',
+  'editing-change'
 ])
 
 defineProps({
