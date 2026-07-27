@@ -16,6 +16,7 @@
         </div>
 
         <TaskInput
+          :disabled="isEditing"
           @add="addTask"
         />
 
@@ -64,6 +65,7 @@
           @toggle="toggleTask"
           @remove="removeTask"
           @edit="editTask"
+          @editing-change="isEditing = $event"
         />
         <div class="flex gap-3">
           <div
@@ -106,6 +108,7 @@ const tasks = ref([])
 const filter = ref('all')
 const searchQuery = ref('')
 const sort = ref('none')
+const isEditing = ref(false)
 
 const completedCount = computed(
   () => tasks.value.filter(task => task.completed).length

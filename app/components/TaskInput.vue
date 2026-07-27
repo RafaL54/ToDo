@@ -2,6 +2,7 @@
   <div class="flex gap-2 mb-6">
     <input
       v-model="newTask"
+      :disabled="disabled"
       class="flex-1 border rounded px-3 py-2 bg-white"
       placeholder="Dodaj zadanie..."
       @keyup.enter="addTask"
@@ -10,7 +11,7 @@
     <input
       v-model="newTaskDate"
       type="date"
-      class="border rounded px-3 py-2 bg-white"
+      class="border rounded px-3 py-2 bg-white cursor-pointer"
     >
 
     <button
@@ -26,6 +27,10 @@
 const newTask = ref('')
 const newTaskDate = ref('')
 const emit = defineEmits(['add'])
+
+defineProps({
+  disabled: Boolean
+})
 
 function addTask() {
   if (newTask.value.trim() === '') return

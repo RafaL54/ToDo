@@ -67,7 +67,8 @@ const cancelingEdit = ref(false)
 const emit = defineEmits([
   'toggle',
   'remove',
-  'edit'
+  'edit',
+  'editing-change'
 ])
 
 const props = defineProps({
@@ -90,6 +91,8 @@ function edit(task) {
   editing.value = true
   editTitle.value = task.title
   editDate.value = task.dueDate || ''
+
+  emit('editing-change', true)
 }
 
 function saveEdit(task) {
