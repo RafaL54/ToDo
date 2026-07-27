@@ -14,6 +14,7 @@
       :task="task"
       @toggle="emit('toggle', $event)"
       @remove="emit('remove', $event)"
+      @edit="emit('edit', $event)"
     />
   </div>
 </template>
@@ -21,7 +22,8 @@
 <script setup>
 const emit = defineEmits([
   'toggle',
-  'remove'
+  'remove',
+  'edit'
 ])
 
 defineProps({

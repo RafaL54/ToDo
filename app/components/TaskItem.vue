@@ -64,9 +64,10 @@ const editTitle = ref('')
 const editDate = ref('')
 const cancelingEdit = ref(false)
 
-defineEmits([
+const emit = defineEmits([
   'toggle',
-  'remove'
+  'remove',
+  'edit'
 ])
 
 const props = defineProps({
@@ -97,8 +98,11 @@ function saveEdit(task) {
     return
   }
 
-  task.title = editTitle.value
-  task.dueDate = editDate.value || null
+  emit('edit', {
+    id: task.id,
+    newTitle: editTitle.value,
+    newDate: editDate.value || null
+  })
 
   editing.value = false
 }

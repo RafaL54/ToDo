@@ -63,6 +63,7 @@
           :tasks="filteredTasks"
           @toggle="toggleTask"
           @remove="removeTask"
+          @edit="editTask"
         />
         <div class="flex gap-3">
           <div
@@ -179,6 +180,15 @@ function removeTask(task) {
 
 function removeCompleted() {
   tasks.value = tasks.value.filter(task => !task.completed)
+}
+
+function editTask({ id, newTitle, newDate }) {
+  const task = tasks.value.find(task => task.id === id)
+
+  if (task) {
+    task.title = newTitle
+    task.dueDate = newDate
+  }
 }
 
 function removeAllTasks() {
