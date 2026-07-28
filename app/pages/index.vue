@@ -104,21 +104,23 @@
 </template>
 
 <script setup>
-const tasks = ref([])
+const {
+  tasks,
+  addTask,
+  toggleTask,
+  removeTask,
+  removeCompleted,
+  editTask,
+  removeAllTasks,
+  completedCount,
+  remainingCount,
+  hasCompleted
+} = useTasks()
+
 const filter = ref('all')
 const searchQuery = ref('')
 const sort = ref('none')
 const isEditing = ref(false)
-
-const completedCount = computed(
-  () => tasks.value.filter(task => task.completed).length
-)
-
-const remainingCount = computed(
-  () => tasks.value.filter(task => !task.completed).length
-)
-
-const hasCompleted = computed(() => tasks.value.some(task => task.completed))
 
 const badgeClass = computed(() => {
   const count = remainingCount.value
@@ -142,7 +144,9 @@ const filteredTasks = computed(() => {
 
   if (searchQuery.value) {
     result = result.filter(task =>
-      task.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+      task.title
+        .toLowerCase()
+        .includes(searchQuery.value.toLowerCase())
     )
   }
 
@@ -163,76 +167,6 @@ const filteredTasks = computed(() => {
 
   return result
 })
-
-function addTask(task) {
-  tasks.value.push({
-    id: Date.now(),
-    title: task.title,
-    completed: false,
-    dueDate: task.dueDate
-  })
-}
-
-function toggleTask(task) {
-  task.completed = !task.completed
-}
-
-function removeTask(task) {
-  tasks.value = tasks.value.filter(item => item.id !== task.id)
-}
-
-function removeCompleted() {
-  tasks.value = tasks.value.filter(task => !task.completed)
-}
-
-function editTask({ id, newTitle, newDate }) {
-  const task = tasks.value.find(task => task.id === id)
-
-  if (task) {
-    task.title = newTitle
-    task.dueDate = newDate
-  }
-}
-
-function removeAllTasks() {
-  const confirmDelete = confirm(
-    'Czy na pewno chcesz usunąć wszystkie zadania?'
-  )
-
-  if (confirmDelete) {
-    tasks.value = []
-  }
-}
-
-onMounted(() => {
-  const savedTasks = localStorage.getItem('tasks')
-  const savedSort = localStorage.getItem('sort')
-
-  console.log('Pobrano:', savedTasks)
-
-  if (savedTasks) {
-    tasks.value = JSON.parse(savedTasks)
-  }
-
-  if (savedSort) {
-    sort.value = savedSort
-  }
-})
-
-watch(
-  tasks,
-  () => {
-    localStorage.setItem('tasks', JSON.stringify(tasks.value))
-  },
-  { deep: true }
-)
-
-watch(
-  sort,
-  () => {
-    localStorage.setItem('sort', sort.value)
-  }
-)
 </script>
 
 /*
