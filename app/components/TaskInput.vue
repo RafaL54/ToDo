@@ -3,19 +3,21 @@
     <input
       v-model="newTask"
       :disabled="disabled"
-      class="flex-1 border rounded px-3 py-2 bg-white"
+      class="flex-1 border rounded px-3 py-2 bg-white cursor-caret disabled:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
       placeholder="Dodaj zadanie..."
       @keyup.enter="addTask"
     >
 
     <input
       v-model="newTaskDate"
+      :disabled="disabled"
       type="date"
-      class="border rounded px-3 py-2 bg-white cursor-pointer"
+      class="border rounded px-3 py-2 bg-white disabled:bg-gray-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
     >
 
     <button
-      class="bg-green-500 text-white px-4 rounded cursor-pointer"
+      :disabled="disabled"
+      class="bg-green-500 text-white px-4 rounded cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed"
       @click="addTask"
     >
       Dodaj
