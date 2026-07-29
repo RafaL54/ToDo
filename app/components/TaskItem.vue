@@ -22,7 +22,7 @@
           v-if="editing"
           v-model="editDate"
           type="date"
-          class="border rounded px-2 py-1 bg-white mt-1"
+          class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
         >
 
         <span
@@ -108,10 +108,12 @@ function saveEdit(task) {
   })
 
   editing.value = false
+  emit('editing-change', false)
 }
 
 function cancelEdit() {
   cancelingEdit.value = true
   editing.value = false
+  emit('editing-change', false)
 }
 </script>
