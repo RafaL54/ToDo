@@ -1,21 +1,29 @@
 export function useTasks() {
   const tasks = ref([])
+  const isLoading = ref(false)
+  const error = ref(null)
 
-  onMounted(() => {
-    const savedTasks = localStorage.getItem('tasks')
+  onMounted(async () => {
+    isLoading.value = true
 
-    if (savedTasks) {
-      tasks.value = JSON.parse(savedTasks)
+    try {
+      const data = await $fetch(
+        'https://dummyjson.com/todos?limit=10'
+      )
+
+      tasks.value = data.todos.map(todo => ({
+        id: todo.id,
+        title: todo.todo,
+        completed: todo.completed,
+        dueDate: null
+      }))
+    } catch (err) {
+      console.log(err)
+      error.value = 'Nie udało się pobrać zadań.'
+    } finally {
+      isLoading.value = false
     }
   })
-
-  watch(
-    tasks,
-    () => {
-      localStorage.setItem('tasks', JSON.stringify(tasks.value))
-    },
-    { deep: true }
-  )
 
   const completedCount = computed(
     () => tasks.value.filter(task => task.completed).length
@@ -79,6 +87,8 @@ export function useTasks() {
     removeAllTasks,
     completedCount,
     remainingCount,
-    hasCompleted
+    hasCompleted,
+    isLoading,
+    error
   }
 }

@@ -60,6 +60,20 @@
           >
         </div>
 
+        <div
+          v-if="isLoading"
+          class="text-center py-5 text-gray-500"
+        >
+          Ładowanie...
+        </div>
+
+        <div
+          v-if="error"
+          class="text-center py-5 text-red-500"
+        >
+          {{ error }}
+        </div>
+
         <TaskList
           :tasks="filteredTasks"
           @toggle="toggleTask"
@@ -114,7 +128,9 @@ const {
   removeAllTasks,
   completedCount,
   remainingCount,
-  hasCompleted
+  hasCompleted,
+  isLoading,
+  error
 } = useTasks()
 
 const filter = ref('all')
