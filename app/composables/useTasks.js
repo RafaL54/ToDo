@@ -85,8 +85,20 @@ export function useTasks() {
     }
   }
 
-  function removeTask(task) {
-    tasks.value = tasks.value.filter(item => item.id !== task.id)
+  async function removeTask(task) {
+    try {
+      await $fetch(
+        `https://dummyjson.com/todos/${task.id}`,
+        {
+          method: 'DELETE'
+        }
+      )
+
+      tasks.value = tasks.value.filter(item => item.id !== task.id)
+    } catch (err) {
+      console.log(err)
+      error.value = 'Nie udało się usunąć zadania'
+    }
   }
 
   function removeCompleted() {
@@ -108,8 +120,6 @@ export function useTasks() {
           }
         }
       )
-
-      console.log(data)
 
       task.title = data.todo
       task.dueDate = newDate
