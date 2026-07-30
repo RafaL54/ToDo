@@ -1,6 +1,7 @@
 export function useTasks() {
   const tasks = ref([])
   const isLoading = ref(false)
+  const isAdding = ref(false)
   const error = ref(null)
 
   onMounted(async () => {
@@ -37,13 +38,32 @@ export function useTasks() {
     tasks.value.some(task => task.completed)
   )
 
-  function addTask(task) {
-    tasks.value.push({
-      id: Date.now(),
-      title: task.title,
-      completed: false,
-      dueDate: task.dueDate
-    })
+  async function addTask(task) {
+    isAdding.value = true
+    error.value = null
+
+    try {
+      const data = await $fetch('https://dummyjson.com/todos/add', {
+        method: 'POST',
+        body: {
+          todo: task.title,
+          completed: false,
+          userId: 1
+        }
+      })
+
+      tasks.value.push({
+        id: data.id,
+        title: data.todo,
+        completed: data.completed,
+        dueDate: task.dueDate
+      })
+    } catch (err) {
+      console.log(err)
+      error.value = 'Nie udało się dodać zadania'
+    } finally {
+      isAdding.value = false
+    }
   }
 
   function toggleTask(task) {
@@ -89,6 +109,7 @@ export function useTasks() {
     remainingCount,
     hasCompleted,
     isLoading,
-    error
+    error,
+    isAdding
   }
 }

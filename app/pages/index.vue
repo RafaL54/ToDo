@@ -16,9 +16,16 @@
         </div>
 
         <TaskInput
-          :disabled="isEditing"
+          :disabled="isEditing || isAdding"
           @add="addTask"
         />
+
+        <p
+          v-if="error"
+          class="text-center text-red-500 text-lg mb-6"
+        >
+          {{ error }}
+        </p>
 
         <div class="flex gap-3 mb-5">
           <select
@@ -65,13 +72,6 @@
           class="text-center py-5 text-gray-500"
         >
           Ładowanie...
-        </div>
-
-        <div
-          v-if="error"
-          class="text-center py-5 text-red-500"
-        >
-          {{ error }}
         </div>
 
         <TaskList
@@ -130,7 +130,8 @@ const {
   remainingCount,
   hasCompleted,
   isLoading,
-  error
+  error,
+  isAdding
 } = useTasks()
 
 const filter = ref('all')
