@@ -66,8 +66,23 @@ export function useTasks() {
     }
   }
 
-  function toggleTask(task) {
-    task.completed = !task.completed
+  async function toggleTask(task) {
+    try {
+      const data = await $fetch(
+        `https://dummyjson.com/todos/${task.id}`,
+        {
+          method: 'PATCH',
+          body: {
+            completed: !task.completed
+          }
+        }
+      )
+
+      task.completed = data.completed
+    } catch (err) {
+      console.log(err)
+      error.value = 'Nie udało się zaktualizować zadania'
+    }
   }
 
   function removeTask(task) {
@@ -78,12 +93,29 @@ export function useTasks() {
     tasks.value = tasks.value.filter(task => !task.completed)
   }
 
-  function editTask({ id, newTitle, newDate }) {
+  async function editTask({ id, newTitle, newDate }) {
     const task = tasks.value.find(task => task.id === id)
 
-    if (task) {
-      task.title = newTitle
+    if (!task) return
+
+    try {
+      const data = await $fetch(
+        `https://dummyjson.com/todos/${id}`,
+        {
+          method: 'PATCH',
+          body: {
+            todo: newTitle
+          }
+        }
+      )
+
+      console.log(data)
+
+      task.title = data.todo
       task.dueDate = newDate
+    } catch (err) {
+      console.log(err)
+      error.value = 'Nie udało się zaktualizować zadania'
     }
   }
 
