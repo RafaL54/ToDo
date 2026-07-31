@@ -1,23 +1,23 @@
 <template>
   <div class="flex flex-col gap-2 mb-6">
     <div class="flex gap-2">
-      <input
+      <UInput
         v-model="newTitle"
         :disabled="editing || isAdding"
-        :class="[error ? 'border border-error outline-error' : '']"
-        class="flex-1 border rounded px-3 py-2 bg-white cursor-caret disabled:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
+        :color="error ? 'error' : 'primary'"
+        class="flex-1"
         placeholder="Dodaj zadanie..."
         @keyup.enter="addTask"
         @blur="newTitle.length ? error = null : ''"
-      >
+      />
 
-      <button
+      <UButton
         :disabled="editing || isAdding"
-        class="bg-green-500 text-white px-4 rounded cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed"
+        color="success"
         @click="addTask"
       >
         Dodaj
-      </button>
+      </UButton>
     </div>
 
     <p
@@ -45,7 +45,7 @@ const toast = useToast()
 
 async function addTask() {
   if (!newTitle.value.length) {
-    error.value = 'Uzupełnij tresc'
+    error.value = 'Uzupełnij treść'
     return
   }
 

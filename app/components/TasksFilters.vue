@@ -1,27 +1,28 @@
 <template>
   <div class="flex gap-3 mb-5">
-    <select
+    <USelect
       v-model="filter"
-      class="border rounded px-2 py-2 bg-white cursor-pointer"
-    >
-      <option value="all">
-        Wszystkie
-      </option>
+      :items="[
+        {
+          label: 'Wszystkie',
+          value: 'all'
+        },
+        {
+          label: 'Aktywne',
+          value: 'active'
+        },
+        {
+          label: 'Ukończone',
+          value: 'completed'
+        }
+      ]"
+    />
 
-      <option value="active">
-        Aktywne
-      </option>
-
-      <option value="completed">
-        Ukończone
-      </option>
-    </select>
-
-    <input
+    <UInput
       v-model="searchQuery"
       placeholder="Szukaj zadania..."
-      class="flex-1 border rounded px-3 py-2 bg-white"
-    >
+      class="flex-1"
+    />
   </div>
 </template>
 
