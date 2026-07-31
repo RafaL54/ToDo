@@ -1,12 +1,14 @@
 <template>
-  <div>
-    <div class="flex gap-2 mb-6">
+  <div class="flex flex-col gap-2 mb-6">
+    <div class="flex gap-2">
       <input
         v-model="newTitle"
         :disabled="editing || isAdding"
+        :class="[error ? 'border border-error outline-error' : '']"
         class="flex-1 border rounded px-3 py-2 bg-white cursor-caret disabled:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
         placeholder="Dodaj zadanie..."
         @keyup.enter="addTask"
+        @blur="newTitle.length ? error = null : ''"
       >
 
       <button
@@ -20,7 +22,7 @@
 
     <p
       v-if="error"
-      class="text-center text-red-500 text-lg mb-6"
+      class="text-left text-error"
     >
       {{ error }}
     </p>
@@ -42,6 +44,11 @@ const error = ref(false)
 const toast = useToast()
 
 async function addTask() {
+  if (!newTitle.value.length) {
+    error.value = 'Uzupełnij tresc'
+    return
+  }
+
   isAdding.value = true
   error.value = null
 

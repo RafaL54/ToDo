@@ -55,23 +55,27 @@
           @edit-change="handleEditChange"
         />
 
-        <div class="flex gap-3">
-          <div class="mt-5">
-            <button
-              class="bg-red-500 text-white px-4 py-2 rounded cursor-pointer"
-              @click="removeAllTasks"
-            >
-              Usuń wszystko
-            </button>
+        <template v-if="tasks.length">
+          <div class="flex gap-3">
+            <div class="mt-5">
+              <UButton
+                class="ml-auto"
+                variant="solid"
+                color="error"
+                @click="removeAll"
+              >
+                Usuń wszystko
+              </UButton>
+            </div>
           </div>
-        </div>
 
-        <div class="mt-6 text-sm text-gray-500">
-          Wykonane:
-          {{ completedCount }}
-          /
-          {{ tasks.length }}
-        </div>
+          <div class="mt-6 text-sm text-gray-500">
+            Wykonane:
+            {{ completedCount }}
+            /
+            {{ tasks.length }}
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -113,6 +117,32 @@ const searchQuery = ref('')
 
 function handleRemoved(id) {
   tasks.value = tasks.value.filter(task => task.id !== id)
+}
+
+const toast = useToast()
+
+async function removeAll() {
+  try {
+    await Promise.all(
+      tasks.value.map(task =>
+        $fetch(`https://dummyjson.com/todos/${task.id}`, {
+          method: 'DELETE'
+        })
+      )
+    )
+
+    tasks.value = []
+    toast.add({
+      title: 'Pomyślnie usunięto wszystkie zadania',
+      color: 'success'
+    })
+  } catch (err) {
+    console.log(err)
+    toast.add({
+      title: 'Nie udało się usunąć zadań',
+      color: 'error'
+    })
+  }
 }
 
 function handleEditChange(id) {
