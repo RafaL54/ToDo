@@ -87,7 +87,7 @@ async function handleSave(task) {
       title: 'Pomyślnie zapisano',
       color: 'success'
     })
-  } catch (e) {
+  } catch {
     toast.add({
       title: 'Nie udało się zapisac',
       color: 'error'
