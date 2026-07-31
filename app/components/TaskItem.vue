@@ -1,119 +1,129 @@
 <template>
-  <div class="flex items-center justify-between w-full gap-3 border-b py-3">
-    <div class="flex items-center gap-2">
-      <input
-        type="checkbox"
-        :checked="task.completed"
-        class="accent-green-500 w-3 h-3 cursor-pointer"
-        @change="$emit('toggle', task)"
-      >
-
-      <div>
-        <input
-          v-if="editing"
-          v-model="editTitle"
-          class="border rounded px-2 py-1 w-full bg-white"
-          @keyup.enter="saveEdit(task)"
-          @blur="saveEdit(task)"
-          @keyup.esc="cancelEdit"
-        >
-
-        <input
-          v-if="editing"
-          v-model="editDate"
-          type="date"
-          class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
-        >
-
-        <span
-          v-else
-          :class="{
-            'line-through text-gray-400': task.completed
-          }"
-          @dblclick="edit(task)"
-        >
-          {{ task.title }}
-        </span>
-
-        <div
-          v-if="task.dueDate"
-          class="text-xs text-gray-500"
-          :class="{
-            'text-red-500': isOverdue,
-            'text-gray-500': !isOverdue
-          }"
-        >
-          Termin: {{ task.dueDate }}
-        </div>
-      </div>
+  <div>
+    <div
+      v-if="filteredTasks.length === 0"
+      class="text-center text-gray-500 py-5"
+    >
+      Brak zadań
     </div>
 
-    <div v-if="task.completed">
-      <UButton
-        icon="i-lucide-trash-2"
-        class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
-        @click="$emit('remove', task)"
-      />
+    <div
+      v-for="task in filteredTasks"
+      :key="task.id"
+      class="flex items-center justify-between w-full gap-3 border-b py-3"
+    >
+      <div class="flex items-center gap-2 flex-1">
+        <input
+          type="checkbox"
+          :checked="task.completed"
+          class="accent-green-500 w-3 h-3 cursor-pointer"
+          @change="toggleTask(task)"
+        >
+
+        <div class="flex-1">
+          <template v-if="editingId === task.id">
+            <input
+              v-model="editTitle"
+              class="border rounded px-2 py-1 w-full bg-white"
+              @keyup.enter="saveEdit(task)"
+              @keyup.esc="cancelEdit"
+            >
+
+            <input
+              v-model="editDate"
+              type="date"
+              class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
+              @keyup.enter="saveEdit(task)"
+            >
+          </template>
+
+          <template v-else>
+            <span
+              :class="{
+                'line-through text-gray-400': task.completed
+              }"
+              @dblclick="startEdit(task)"
+            >
+              {{ task.title }}
+            </span>
+
+            <div
+              v-if="task.dueDate"
+              class="text-xs"
+              :class="{
+                'text-red-500': isOverdue(task),
+                'text-gray-500': !isOverdue(task)
+              }"
+            >
+              Termin: {{ task.dueDate }}
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div v-if="task.completed">
+        <UButton
+          icon="i-lucide-trash-2"
+          class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
+          @click="removeTask(task)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-const editing = ref(false)
+const {
+  filteredTasks,
+  toggleTask,
+  removeTask,
+  editTask,
+  isEditing
+} = useTasks()
+
+const editingId = ref(null)
 const editTitle = ref('')
 const editDate = ref('')
-const cancelingEdit = ref(false)
 
-const emit = defineEmits([
-  'toggle',
-  'remove',
-  'edit',
-  'editing-change'
-])
-
-const props = defineProps({
-  task: Object
-})
-
-const isOverdue = computed(() => {
-  if (!props.task.dueDate) return false
-
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const dueDate = new Date(props.task.dueDate)
-  dueDate.setHours(0, 0, 0, 0)
-
-  return dueDate < today
-})
-
-function edit(task) {
-  editing.value = true
+function startEdit(task) {
+  editingId.value = task.id
   editTitle.value = task.title
   editDate.value = task.dueDate || ''
 
-  emit('editing-change', true)
+  isEditing.value = true
 }
 
-function saveEdit(task) {
-  if (cancelingEdit.value) {
-    cancelingEdit.value = false
-    return
-  }
+async function saveEdit(task) {
+  if (!editTitle.value.trim()) return
 
-  emit('edit', {
+  await editTask({
     id: task.id,
     newTitle: editTitle.value,
     newDate: editDate.value || null
   })
 
-  editing.value = false
-  emit('editing-change', false)
+  editingId.value = null
+  editTitle.value = ''
+  editDate.value = ''
+  isEditing.value = false
 }
 
 function cancelEdit() {
-  cancelingEdit.value = true
-  editing.value = false
-  emit('editing-change', false)
+  editingId.value = null
+  editTitle.value = ''
+  editDate.value = ''
+  isEditing.value = false
+}
+
+function isOverdue(task) {
+  if (!task.dueDate) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const dueDate = new Date(task.dueDate)
+  dueDate.setHours(0, 0, 0, 0)
+
+  return dueDate < today
 }
 </script>
