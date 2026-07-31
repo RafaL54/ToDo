@@ -2,51 +2,20 @@
   <div class="min-h-screen p-6">
     <div class="mx-auto max-w-3xl">
       <div class="border rounded-lg p-6 shadow bg-gray-50">
-        <div class="flex items-center justify-between mb-6">
-          <h1 class="text-2xl font-bold">
-            Moja lista zadań
-          </h1>
-
-          <span
-            v-if="remainingCount"
-            :class="[
-              'px-3 py-1 rounded text-white text-sm',
-              badgeClass
-            ]"
-          >
-            {{ remainingCount }} zostało
-          </span>
-        </div>
+        <TasksHeader
+          :remaining-count="remainingCount"
+          :badge-class="badgeClass"
+        />
 
         <TaskInput
           :editing="hasEditingState"
           @added="handleAdded"
         />
 
-        <div class="flex gap-3 mb-5">
-          <select
-            v-model="filter"
-            class="border rounded px-2 py-2 bg-white cursor-pointer"
-          >
-            <option value="all">
-              Wszystkie
-            </option>
-
-            <option value="active">
-              Aktywne
-            </option>
-
-            <option value="completed">
-              Ukończone
-            </option>
-          </select>
-
-          <input
-            v-model="searchQuery"
-            placeholder="Szukaj zadania..."
-            class="flex-1 border rounded px-3 py-2 bg-white"
-          >
-        </div>
+        <TasksFilters
+          v-model:filter="filter"
+          v-model:search-query="searchQuery"
+        />
 
         <TaskList
           :tasks="filteredTasks"
@@ -55,33 +24,19 @@
           @edit-change="handleEditChange"
         />
 
-        <template v-if="tasks.length">
-          <div class="flex gap-3">
-            <div class="mt-5">
-              <UButton
-                class="ml-auto"
-                variant="solid"
-                color="error"
-                @click="removeAll"
-              >
-                Usuń wszystko
-              </UButton>
-            </div>
-          </div>
-
-          <div class="mt-6 text-sm text-gray-500">
-            Wykonane:
-            {{ completedCount }}
-            /
-            {{ tasks.length }}
-          </div>
-        </template>
+        <TasksFooter
+          :tasks-count="tasks.length"
+          :completed-count="completedCount"
+          @remove-all="removeAll"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import TasksHeader from '~/components/TasksHeader.vue'
+
 const loading = ref(false)
 const error = ref(null)
 const tasks = ref([])
