@@ -55,7 +55,8 @@ async function fetchTasks() {
       title: todo.todo,
       completed: todo.completed,
       editing: false,
-      saving: false
+      saving: false,
+      fromApi: true
     }))
   } catch (err) {
     console.log(err)
@@ -79,20 +80,24 @@ const toast = useToast()
 async function removeAll() {
   try {
     await Promise.all(
-      tasks.value.map(task =>
-        $fetch(`https://dummyjson.com/todos/${task.id}`, {
-          method: 'DELETE'
-        })
-      )
+      tasks.value
+        .filter(task => task.fromApi)
+        .map(task =>
+          $fetch(`https://dummyjson.com/todos/${task.id}`, {
+            method: 'DELETE'
+          })
+        )
     )
 
     tasks.value = []
+
     toast.add({
       title: 'Pomyślnie usunięto wszystkie zadania',
       color: 'success'
     })
   } catch (err) {
     console.log(err)
+
     toast.add({
       title: 'Nie udało się usunąć zadań',
       color: 'error'
@@ -111,7 +116,8 @@ function handleAdded(newTodo) {
     title: newTodo.todo,
     completed: newTodo.completed,
     editing: false,
-    saving: false
+    saving: false,
+    fromApi: false
   })
 }
 

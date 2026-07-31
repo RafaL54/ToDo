@@ -1,21 +1,20 @@
 <template>
   <div class="grow flex justify-between gap-2 items-center">
     <div class="flex items-center gap-2 flex-1">
-      <input
-        type="checkbox"
-        :checked="task.completed"
-        class="accent-green-500 size-5 cursor-pointer"
+      <UCheckbox
+        :model-value="task.completed"
+        size="lg"
         :disabled="task.saving"
-        @change="toggleTask(task, $event)"
-      >
+        @update:model-value="toggleTask(task, $event)"
+      />
 
       <div class="flex-1">
         <template v-if="task.editing">
-          <input
+          <UInput
             v-model="newTitle"
-            class="border rounded px-2 py-1 w-full bg-white"
-            @keyup.enter="saveEdit(task)"
-          >
+            class="w-full"
+            @keyup.enter="handleSave(task)"
+          />
         </template>
 
         <template v-else>
@@ -69,6 +68,20 @@ function handleEdit(task) {
 const toast = useToast()
 
 async function handleSave(task) {
+  if (!newTitle.value.trim()) return
+
+  if (!task.fromApi) {
+    task.title = newTitle.value.trim()
+    handleEdit(task)
+
+    toast.add({
+      title: 'Pomyślnie zapisano',
+      color: 'success'
+    })
+
+    return
+  }
+
   try {
     const data = await $fetch(
       `https://dummyjson.com/todos/${task.id}`,
@@ -83,6 +96,7 @@ async function handleSave(task) {
     task.title = data.todo
 
     handleEdit(task)
+
     toast.add({
       title: 'Pomyślnie zapisano',
       color: 'success'
@@ -95,35 +109,41 @@ async function handleSave(task) {
   }
 }
 
-async function toggleTask(task, event) {
+async function toggleTask(task, completed) {
   task.saving = true
+
   try {
     const data = await $fetch(
       `https://dummyjson.com/todos/${task.id}`,
       {
         method: 'PATCH',
         body: {
-          completed: event.target.checked
+          completed
         }
       }
     )
 
     task.completed = data.completed
-    task.saving = false
-    toast.add({
-      title: 'Pomyślnie zapisano',
-      color: 'success'
-    })
   } catch (err) {
     console.log(err)
-    toast.add({
-      title: 'Nie udało się zapisac',
-      color: 'error'
-    })
+    task.completed = completed
+  } finally {
+    task.saving = false
   }
 }
 
 async function removeTask(task) {
+  if (!task.fromApi) {
+    emit('removed', task.id)
+
+    toast.add({
+      title: 'Pomyślnie usunięto zadanie',
+      color: 'success'
+    })
+
+    return
+  }
+
   try {
     await $fetch(
       `https://dummyjson.com/todos/${task.id}`,
@@ -133,12 +153,14 @@ async function removeTask(task) {
     )
 
     emit('removed', task.id)
+
     toast.add({
       title: 'Pomyślnie usunięto zadanie',
       color: 'success'
     })
   } catch (err) {
     console.log(err)
+
     toast.add({
       title: 'Nie udało się usunąć zadania',
       color: 'error'

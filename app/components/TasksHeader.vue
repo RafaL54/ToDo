@@ -4,15 +4,13 @@
       Moja lista zadań
     </h1>
 
-    <span
+    <UBadge
       v-if="remainingCount"
-      :class="[
-        'px-3 py-1 rounded text-white text-sm',
-        badgeClass
-      ]"
+      size="lg"
+      :class="badgeClass"
     >
       {{ remainingCount }} zostało
-    </span>
+    </UBadge>
   </div>
 </template>
 
