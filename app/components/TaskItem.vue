@@ -1,129 +1,148 @@
 <template>
-  <div>
-    <div
-      v-if="filteredTasks.length === 0"
-      class="text-center text-gray-500 py-5"
-    >
-      Brak zadań
+  <div class="grow flex justify-between gap-2 items-center">
+    <div class="flex items-center gap-2 flex-1">
+      <input
+        type="checkbox"
+        :checked="task.completed"
+        class="accent-green-500 size-5 cursor-pointer"
+        :disabled="task.saving"
+        @change="toggleTask(task, $event)"
+      >
+
+      <div class="flex-1">
+        <template v-if="task.editing">
+          <input
+            v-model="newTitle"
+            class="border rounded px-2 py-1 w-full bg-white"
+            @keyup.enter="saveEdit(task)"
+          >
+        </template>
+
+        <template v-else>
+          <span
+            :class="{
+              'line-through text-gray-400': task.completed
+            }"
+          >
+            {{ task.title }}
+          </span>
+        </template>
+      </div>
     </div>
 
-    <div
-      v-for="task in filteredTasks"
-      :key="task.id"
-      class="flex items-center justify-between w-full gap-3 border-b py-3"
-    >
-      <div class="flex items-center gap-2 flex-1">
-        <input
-          type="checkbox"
-          :checked="task.completed"
-          class="accent-green-500 w-3 h-3 cursor-pointer"
-          @change="toggleTask(task)"
-        >
-
-        <div class="flex-1">
-          <template v-if="editingId === task.id">
-            <input
-              v-model="editTitle"
-              class="border rounded px-2 py-1 w-full bg-white"
-              @keyup.enter="saveEdit(task)"
-              @keyup.esc="cancelEdit"
-            >
-
-            <input
-              v-model="editDate"
-              type="date"
-              class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
-              @keyup.enter="saveEdit(task)"
-            >
-          </template>
-
-          <template v-else>
-            <span
-              :class="{
-                'line-through text-gray-400': task.completed
-              }"
-              @dblclick="startEdit(task)"
-            >
-              {{ task.title }}
-            </span>
-
-            <div
-              v-if="task.dueDate"
-              class="text-xs"
-              :class="{
-                'text-red-500': isOverdue(task),
-                'text-gray-500': !isOverdue(task)
-              }"
-            >
-              Termin: {{ task.dueDate }}
-            </div>
-          </template>
-        </div>
-      </div>
-
-      <div v-if="task.completed">
-        <UButton
-          icon="i-lucide-trash-2"
-          class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
-          @click="removeTask(task)"
-        />
-      </div>
+    <div class="flex items-center gap-2">
+      <UButton
+        v-if="task.title !== newTitle"
+        icon="i-lucide-check"
+        @click="handleSave(task)"
+      />
+      <UButton
+        :icon="task.editing ? 'i-lucide-x' : 'i-lucide-square-pen'"
+        :color="task.editing ? 'error' : 'neutral'"
+        variant="outline"
+        :disabled="task.saving"
+        @click="handleEdit(task)"
+      />
+      <UButton
+        icon="i-lucide-trash-2"
+        color="error"
+        variant="solid"
+        :disabled="task.saving"
+        @click="removeTask(task)"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-const {
-  filteredTasks,
-  toggleTask,
-  removeTask,
-  editTask,
-  isEditing
-} = useTasks()
+const emit = defineEmits(['removed', 'edit-change'])
+const props = defineProps({
+  task: Object
+})
 
-const editingId = ref(null)
-const editTitle = ref('')
-const editDate = ref('')
-
-function startEdit(task) {
-  editingId.value = task.id
-  editTitle.value = task.title
-  editDate.value = task.dueDate || ''
-
-  isEditing.value = true
+function handleEdit(task) {
+  emit('edit-change', task.id)
 }
 
-async function saveEdit(task) {
-  if (!editTitle.value.trim()) return
+const toast = useToast()
 
-  await editTask({
-    id: task.id,
-    newTitle: editTitle.value,
-    newDate: editDate.value || null
-  })
+async function handleSave(task) {
+  try {
+    const data = await $fetch(
+      `https://dummyjson.com/todos/${task.id}`,
+      {
+        method: 'PATCH',
+        body: {
+          todo: newTitle.value.trim()
+        }
+      }
+    )
 
-  editingId.value = null
-  editTitle.value = ''
-  editDate.value = ''
-  isEditing.value = false
+    task.title = data.todo
+
+    handleEdit(task)
+    toast.add({
+      title: 'Pomyślnie zapisano',
+      color: 'success'
+    })
+  } catch (e) {
+    toast.add({
+      title: 'Nie udało się zapisac',
+      color: 'error'
+    })
+  }
 }
 
-function cancelEdit() {
-  editingId.value = null
-  editTitle.value = ''
-  editDate.value = ''
-  isEditing.value = false
+async function toggleTask(task, event) {
+  task.saving = true
+  try {
+    const data = await $fetch(
+      `https://dummyjson.com/todos/${task.id}`,
+      {
+        method: 'PATCH',
+        body: {
+          completed: event.target.checked
+        }
+      }
+    )
+
+    task.completed = data.completed
+    task.saving = false
+    toast.add({
+      title: 'Pomyślnie zapisano',
+      color: 'success'
+    })
+  } catch (err) {
+    console.log(err)
+    toast.add({
+      title: 'Nie udało się zapisac',
+      color: 'error'
+    })
+  }
 }
 
-function isOverdue(task) {
-  if (!task.dueDate) return false
+async function removeTask(task) {
+  try {
+    await $fetch(
+      `https://dummyjson.com/todos/${task.id}`,
+      {
+        method: 'DELETE'
+      }
+    )
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const dueDate = new Date(task.dueDate)
-  dueDate.setHours(0, 0, 0, 0)
-
-  return dueDate < today
+    emit('removed', task.id)
+    toast.add({
+      title: 'Pomyślnie usunięto zadanie',
+      color: 'success'
+    })
+  } catch (err) {
+    console.log(err)
+    toast.add({
+      title: 'Nie udało się usunąć zadania',
+      color: 'error'
+    })
+  }
 }
+
+const newTitle = ref(props.task.title)
 </script>
