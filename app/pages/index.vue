@@ -20,13 +20,6 @@
 
         <TaskInput />
 
-        <p
-          v-if="error"
-          class="text-center text-red-500 text-lg mb-6"
-        >
-          {{ error }}
-        </p>
-
         <div class="flex gap-3 mb-5">
           <select
             v-model="filter"
@@ -69,13 +62,6 @@
           >
         </div>
 
-        <div
-          v-if="isLoading"
-          class="text-center py-5 text-gray-500"
-        >
-          Ładowanie...
-        </div>
-
         <TaskList />
 
         <div class="flex gap-3">
@@ -113,6 +99,13 @@
 </template>
 
 <script setup>
+import { useTasksStore } from '~/stores/tasks'
+import { storeToRefs } from 'pinia'
+
+const {
+  fetchTasks
+} = useTasksStore()
+
 const {
   tasks,
   removeCompleted,
@@ -120,16 +113,11 @@ const {
   completedCount,
   remainingCount,
   hasCompleted,
-  isLoading,
-  error,
-  fetchTasks,
   filter,
   searchQuery,
   sort,
   badgeClass
-} = useTasks()
+} = storeToRefs(useTasksStore())
 
-onMounted(() => {
-  fetchTasks()
-})
+fetchTasks()
 </script>

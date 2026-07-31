@@ -1,14 +1,16 @@
-const tasks = ref([])
-const isLoading = ref(false)
-const isAdding = ref(false)
-const error = ref(null)
-const isEditing = ref(false)
+import { defineStore } from 'pinia'
 
-const filter = ref('all')
-const searchQuery = ref('')
-const sort = ref('none')
+export const useTasksStore = defineStore('tasks', () => {
+  const tasks = ref([])
+  const isLoading = ref(false)
+  const isAdding = ref(false)
+  const error = ref(null)
+  const isEditing = ref(false)
 
-export function useTasks() {
+  const filter = ref('all')
+  const searchQuery = ref('')
+  const sort = ref('none')
+
   async function fetchTasks() {
     isLoading.value = true
     error.value = null
@@ -250,4 +252,4 @@ export function useTasks() {
     filteredTasks,
     badgeClass
   }
-}
+})

@@ -1,85 +1,79 @@
 <template>
-  <div>
-    <div
-      v-if="filteredTasks.length === 0"
-      class="text-center text-gray-500 py-5"
-    >
-      Brak zadań
+  <div class="flex grow items-center justify-between">
+    <div class="flex items-center gap-2 grow flex-1">
+      <input
+        type="checkbox"
+        :checked="task.completed"
+        class="accent-green-500 w-3 h-3 cursor-pointer"
+        @change="toggleTask(task)"
+      >
+
+      <div class="flex-1">
+        <template v-if="editingId === task.id">
+          <input
+            v-model="editTitle"
+            class="border rounded px-2 py-1 w-full bg-white"
+            @keyup.enter="saveEdit(task)"
+            @keyup.esc="cancelEdit"
+          >
+
+          <input
+            v-model="editDate"
+            type="date"
+            class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
+            @keyup.enter="saveEdit(task)"
+          >
+        </template>
+
+        <template v-else>
+          <span
+            :class="{
+              'line-through text-gray-400': task.completed
+            }"
+            @dblclick="startEdit(task)"
+          >
+            {{ task.title }}
+          </span>
+
+          <div
+            v-if="task.dueDate"
+            class="text-xs"
+            :class="{
+              'text-red-500': isOverdue(task),
+              'text-gray-500': !isOverdue(task)
+            }"
+          >
+            Termin: {{ task.dueDate }}
+          </div>
+        </template>
+      </div>
     </div>
 
-    <div
-      v-for="task in filteredTasks"
-      :key="task.id"
-      class="flex items-center justify-between w-full gap-3 border-b py-3"
-    >
-      <div class="flex items-center gap-2 flex-1">
-        <input
-          type="checkbox"
-          :checked="task.completed"
-          class="accent-green-500 w-3 h-3 cursor-pointer"
-          @change="toggleTask(task)"
-        >
-
-        <div class="flex-1">
-          <template v-if="editingId === task.id">
-            <input
-              v-model="editTitle"
-              class="border rounded px-2 py-1 w-full bg-white"
-              @keyup.enter="saveEdit(task)"
-              @keyup.esc="cancelEdit"
-            >
-
-            <input
-              v-model="editDate"
-              type="date"
-              class="border rounded px-2 py-1 bg-white mt-1 cursor-pointer"
-              @keyup.enter="saveEdit(task)"
-            >
-          </template>
-
-          <template v-else>
-            <span
-              :class="{
-                'line-through text-gray-400': task.completed
-              }"
-              @dblclick="startEdit(task)"
-            >
-              {{ task.title }}
-            </span>
-
-            <div
-              v-if="task.dueDate"
-              class="text-xs"
-              :class="{
-                'text-red-500': isOverdue(task),
-                'text-gray-500': !isOverdue(task)
-              }"
-            >
-              Termin: {{ task.dueDate }}
-            </div>
-          </template>
-        </div>
-      </div>
-
-      <div v-if="task.completed">
-        <UButton
-          icon="i-lucide-trash-2"
-          class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
-          @click="removeTask(task)"
-        />
-      </div>
+    <div v-if="task.completed">
+      <UButton
+        icon="i-lucide-trash-2"
+        class="bg-red-500 text-white p-2 rounded-full cursor-pointer"
+        @click="removeTask(task)"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
+import { storeToRefs } from 'pinia'
+import { useTasksStore } from '~/stores/tasks'
+
+defineProps({
+  task: Object
+})
+
 const {
-  filteredTasks,
   toggleTask,
   removeTask,
-  editTask,
-  isEditing
-} = useTasks()
+  editTask
+} = useTasksStore()
+
+const { isEditing } = storeToRefs(useTasksStore())
 
 const editingId = ref(null)
 const editTitle = ref('')
