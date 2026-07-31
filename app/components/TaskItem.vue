@@ -60,6 +60,8 @@ const props = defineProps({
   task: Object
 })
 
+const newTitle = ref(props.task.title)
+
 function handleEdit(task) {
   emit('edit-change', task.id)
 }
@@ -143,6 +145,4 @@ async function removeTask(task) {
     })
   }
 }
-
-const newTitle = ref(props.task.title)
 </script>
