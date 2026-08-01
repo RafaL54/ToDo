@@ -2,20 +2,7 @@
   <div class="flex gap-3 mb-5">
     <USelect
       v-model="filter"
-      :items="[
-        {
-          label: 'Wszystkie',
-          value: 'all'
-        },
-        {
-          label: 'Aktywne',
-          value: 'active'
-        },
-        {
-          label: 'Ukończone',
-          value: 'completed'
-        }
-      ]"
+      :items="filterItems"
     />
 
     <UInput
@@ -36,4 +23,19 @@ const searchQuery = defineModel('searchQuery', {
   type: String,
   default: ''
 })
+
+const filterItems = [
+  {
+    label: 'Wszystkie',
+    value: 'all'
+  },
+  {
+    label: 'Aktywne',
+    value: 'active'
+  },
+  {
+    label: 'Ukończone',
+    value: 'completed'
+  }
+]
 </script>

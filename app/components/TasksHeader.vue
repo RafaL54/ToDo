@@ -7,7 +7,8 @@
     <UBadge
       v-if="remainingCount"
       size="lg"
-      :class="badgeClass"
+      :color="badgeColor"
+      :class="{ 'animate-pulse': badgeColor === 'error' }"
     >
       {{ remainingCount }} zostało
     </UBadge>
@@ -20,7 +21,7 @@ defineProps({
     type: Number,
     required: true
   },
-  badgeClass: {
+  badgeColor: {
     type: String,
     required: true
   }

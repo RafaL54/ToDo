@@ -4,7 +4,7 @@
       <div class="border rounded-lg p-6 shadow bg-gray-50">
         <TasksHeader
           :remaining-count="remainingCount"
-          :badge-class="badgeClass"
+          :badge-color="badgeColor"
         />
 
         <TaskInput
@@ -126,13 +126,13 @@ const hasEditingState = computed(() => tasks.value.some(t => t.editing))
 const completedCount = computed(() => tasks.value.filter(t => t.completed).length)
 const remainingCount = computed(() => tasks.value.filter(t => !t.completed).length)
 
-const badgeClass = computed(() => {
+const badgeColor = computed(() => {
   const count = remainingCount.value
 
-  if (count <= 2) return 'bg-green-500'
-  if (count <= 5) return 'bg-yellow-500'
+  if (count <= 2) return 'success'
+  if (count <= 5) return 'warning'
 
-  return 'bg-red-500 animate-pulse'
+  return 'error'
 })
 
 const filteredTasks = computed(() => {
