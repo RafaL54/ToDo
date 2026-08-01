@@ -1,56 +1,66 @@
 <template>
-  <div class="flex flex-col gap-2 mb-6">
-    <div class="flex gap-2">
-      <UInput
-        v-model="newTitle"
-        :disabled="editing || isAdding"
-        :color="error ? 'error' : 'primary'"
-        class="flex-1"
-        placeholder="Dodaj zadanie..."
-        @keyup.enter="addTask"
-        @blur="newTitle.length ? error = null : ''"
-      />
-
-      <UButton
-        :disabled="editing || isAdding"
-        color="success"
-        @click="addTask"
-      >
-        Dodaj
-      </UButton>
-    </div>
-
-    <p
-      v-if="error"
-      class="text-left text-error"
+  <UForm
+    :validate="validate"
+    :state="state"
+    class="flex flex-col gap-2 mb-6"
+    @submit="addTask"
+  >
+    <UFormField
+      name="title"
+      class="flex-1"
     >
-      {{ error }}
-    </p>
-  </div>
+      <div class="flex gap-2">
+        <UInput
+          v-model="state.title"
+          :disabled="editing || isAdding"
+          class="flex-1"
+          placeholder="Dodaj zadanie..."
+        />
+
+        <UButton
+          type="submit"
+          :disabled="editing || isAdding"
+          color="success"
+        >
+          Dodaj
+        </UButton>
+      </div>
+    </UFormField>
+  </UForm>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({
   editing: Boolean
 })
 
 const emit = defineEmits(['added'])
 
-const newTitle = ref('')
+const state = reactive({
+  title: ''
+})
+
+type Schema = typeof state
+
+function validate(state: Partial<Schema>) {
+  const errors = []
+
+  if (!state.title?.trim()) {
+    errors.push({
+      name: 'title',
+      message: 'Uzupełnij treść'
+    })
+  }
+
+  return errors
+}
 
 const isAdding = ref(false)
-const error = ref(false)
 
 const toast = useToast()
 
 async function addTask() {
-  if (!newTitle.value.length) {
-    error.value = 'Uzupełnij treść'
-    return
-  }
-
   isAdding.value = true
-  error.value = null
 
   try {
     const data = await $fetch(
@@ -58,21 +68,23 @@ async function addTask() {
       {
         method: 'POST',
         body: {
-          todo: newTitle.value.trim(''),
+          todo: state.title.trim(),
           userId: 1
         }
       }
     )
 
-    newTitle.value = ''
+    state.title = ''
 
     emit('added', data)
+
     toast.add({
       title: 'Pomyślnie dodano zadanie',
       color: 'success'
     })
   } catch (err) {
     console.log(err)
+
     toast.add({
       title: 'Ups coś poszło nie tak',
       color: 'error'
