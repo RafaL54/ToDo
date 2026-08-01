@@ -18,13 +18,14 @@
         </template>
 
         <template v-else>
-          <span
+          <NuxtLink
+            :to="`/tasks/${task.id}`"
             :class="{
               'line-through text-gray-400': task.completed
             }"
           >
             {{ task.title }}
-          </span>
+          </NuxtLink>
         </template>
       </div>
     </div>
