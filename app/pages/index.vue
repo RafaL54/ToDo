@@ -20,9 +20,27 @@
         <TaskList
           :tasks="filteredTasks"
           :loading="loading"
-          @removed="handleRemoved"
-          @edit-change="handleEditChange"
-        />
+        >
+          <template #loading>
+            <div class="text-center py-5 text-gray-500">
+              Ładowanie...
+            </div>
+          </template>
+
+          <template #empty>
+            <div class="text-center text-gray-500 py-5">
+              Brak zadań
+            </div>
+          </template>
+
+          <template #item="{ task }">
+            <TaskItem
+              :task="task"
+              @removed="handleRemoved"
+              @edit-change="handleEditChange"
+            />
+          </template>
+        </TaskList>
 
         <TasksFooter
           :tasks-count="tasks.length"
