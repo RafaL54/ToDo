@@ -36,6 +36,7 @@
           <template #item="{ task }">
             <TaskItem
               :task="task"
+              show-details
               @removed="handleRemoved"
               @edit-change="handleEditChange"
             />
@@ -57,7 +58,7 @@ import TasksHeader from '~/components/TasksHeader.vue'
 
 const loading = ref(false)
 const error = ref(null)
-const tasks = ref([])
+const tasks = useState('tasks', () => [])
 
 async function fetchTasks() {
   loading.value = true
@@ -84,7 +85,9 @@ async function fetchTasks() {
   }
 }
 
-fetchTasks()
+if (!tasks.value.length) {
+  fetchTasks()
+}
 
 const filter = ref('all')
 const searchQuery = ref('')

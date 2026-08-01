@@ -18,24 +18,32 @@
         </template>
 
         <template v-else>
-          <NuxtLink
-            :to="`/tasks/${task.id}`"
+          <span
             :class="{
               'line-through text-gray-400': task.completed
             }"
           >
             {{ task.title }}
-          </NuxtLink>
+          </span>
         </template>
       </div>
     </div>
 
     <div class="flex items-center gap-2">
       <UButton
+        v-if="showDetails"
+        :to="`/tasks/${task.id}`"
+        icon="i-lucide-search"
+        color="info"
+        variant="soft"
+      />
+
+      <UButton
         v-if="task.title !== newTitle"
         icon="i-lucide-check"
         @click="handleSave(task)"
       />
+
       <UButton
         :icon="task.editing ? 'i-lucide-x' : 'i-lucide-square-pen'"
         :color="task.editing ? 'error' : 'neutral'"
@@ -43,6 +51,7 @@
         :disabled="task.saving"
         @click="handleEdit(task)"
       />
+
       <UButton
         icon="i-lucide-trash-2"
         color="error"
@@ -56,13 +65,16 @@
 
 <script setup>
 const emit = defineEmits(['removed', 'edit-change'])
+
 const props = defineProps({
-  task: Object
+  task: Object,
+  showDetails: Boolean
 })
 
 const newTitle = ref(props.task.title)
 
 function handleEdit(task) {
+  newTitle.value = task.title
   emit('edit-change', task.id)
 }
 
