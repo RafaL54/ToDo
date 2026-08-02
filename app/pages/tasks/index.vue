@@ -19,7 +19,7 @@
 
         <TaskList
           :tasks="filteredTasks"
-          :loading="loading"
+          :loading="pending"
         >
           <template #loading>
             <div class="text-center py-5 text-gray-500">
@@ -56,37 +56,25 @@
 <script setup>
 import TasksHeader from '~/components/TasksHeader.vue'
 
-const loading = ref(false)
-const error = ref(null)
 const tasks = useState('tasks', () => [])
 
-async function fetchTasks() {
-  loading.value = true
-  error.value = null
+const { data, pending, error } = await useFetch(
+  'https://dummyjson.com/todos?limit=10'
+)
 
-  try {
-    const data = await $fetch(
-      'https://dummyjson.com/todos?limit=10'
-    )
-
-    tasks.value = data.todos.map(todo => ({
-      id: todo.id,
-      title: todo.todo,
-      completed: todo.completed,
-      editing: false,
-      saving: false,
-      fromApi: true
-    }))
-  } catch (err) {
-    console.log(err)
-    error.value = 'Nie udało się pobrać zadań.'
-  } finally {
-    loading.value = false
-  }
+if (error.value) {
+  console.log(error.value)
 }
 
-if (!tasks.value.length) {
-  fetchTasks()
+if (!tasks.value.length && data.value) {
+  tasks.value = data.value.todos.map(todo => ({
+    id: todo.id,
+    title: todo.todo,
+    completed: todo.completed,
+    editing: false,
+    saving: false,
+    fromApi: true
+  }))
 }
 
 const filter = ref('all')
