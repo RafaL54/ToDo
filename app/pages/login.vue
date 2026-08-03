@@ -6,7 +6,7 @@
           Logowanie
         </h1>
 
-        <UForm>
+        <UForm @submit="handleLogin">
           <UFormField label="E-mail">
             <UInput v-model="email" />
           </UFormField>
@@ -33,4 +33,9 @@
 <script setup>
 const email = ref('')
 const password = ref('')
+const { login } = useAuth()
+
+async function handleLogin() {
+  await login(email.value, password.value)
+}
 </script>
