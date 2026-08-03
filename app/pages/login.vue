@@ -8,11 +8,14 @@
 
         <UForm>
           <UFormField label="E-mail">
-            <UInput />
+            <UInput v-model="email" />
           </UFormField>
 
           <UFormField label="Hasło">
-            <UInput type="password" />
+            <UInput
+              v-model="password"
+              type="password"
+            />
           </UFormField>
 
           <UButton
@@ -26,3 +29,8 @@
     </div>
   </div>
 </template>
+
+<script setup>
+const email = ref('')
+const password = ref('')
+</script>
