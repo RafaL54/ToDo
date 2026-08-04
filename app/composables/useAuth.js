@@ -14,6 +14,7 @@ export function useAuth() {
     token.value = data.token
     user.value = data.user
   }
+
   async function fetchUser() {
     if (!token.value) {
       return
@@ -30,10 +31,26 @@ export function useAuth() {
       user.value = null
     }
   }
+
+  async function logout() {
+    if (token.value) {
+      await $fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        }
+      })
+    }
+
+    token.value = null
+    user.value = null
+  }
+
   return {
     user,
     token,
     login,
-    fetchUser
+    fetchUser,
+    logout
   }
 }
