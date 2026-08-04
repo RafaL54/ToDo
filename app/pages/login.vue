@@ -53,6 +53,7 @@ async function handleLogin() {
 
   try {
     await login(email.value, password.value)
+    await navigateTo('/tasks')
   } catch {
     errorMessage.value = 'Nieprawidłowy e-mail lub hasło.'
   }
