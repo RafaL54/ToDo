@@ -54,6 +54,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'auth'
+})
 import TasksHeader from '~/components/TasksHeader.vue'
 
 const tasks = useState('tasks', () => [])
