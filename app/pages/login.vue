@@ -33,9 +33,14 @@
 <script setup>
 const email = ref('')
 const password = ref('')
+
 const { login } = useAuth()
 
 async function handleLogin() {
+  if (!email.value.trim() || !password.value.trim()) {
+    return
+  }
+
   await login(email.value, password.value)
 }
 </script>
