@@ -4,14 +4,24 @@
       Moja lista zadań
     </h1>
 
-    <UBadge
-      v-if="remainingCount"
-      size="lg"
-      :color="badgeColor"
-      :class="{ 'animate-pulse': badgeColor === 'error' }"
-    >
-      {{ remainingCount }} zostało
-    </UBadge>
+    <div class="flex items-center gap-3">
+      <UBadge
+        v-if="remainingCount"
+        size="lg"
+        :color="badgeColor"
+        :class="{ 'animate-pulse': badgeColor === 'error' }"
+      >
+        {{ remainingCount }} zostało
+      </UBadge>
+
+      <UButton
+        color="error"
+        variant="soft"
+        @click="handleLogout"
+      >
+        Wyloguj
+      </UButton>
+    </div>
   </div>
 </template>
 
@@ -26,4 +36,11 @@ defineProps({
     required: true
   }
 })
+
+const { logout } = useAuth()
+
+async function handleLogout() {
+  await logout()
+  await navigateTo('/login')
+}
 </script>
