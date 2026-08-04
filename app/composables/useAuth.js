@@ -14,10 +14,26 @@ export function useAuth() {
     token.value = data.token
     user.value = data.user
   }
+  async function fetchUser() {
+    if (!token.value) {
+      return
+    }
 
+    try {
+      user.value = await $fetch('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        }
+      })
+    } catch {
+      token.value = null
+      user.value = null
+    }
+  }
   return {
     user,
     token,
-    login
+    login,
+    fetchUser
   }
 }
