@@ -38,6 +38,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: 'guest'
+})
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
@@ -58,3 +61,4 @@ async function handleLogin() {
     errorMessage.value = 'Nieprawidłowy e-mail lub hasło.'
   }
 }
+</script>
