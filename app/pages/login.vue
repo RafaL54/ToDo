@@ -6,6 +6,13 @@
           Logowanie
         </h1>
 
+        <p
+          v-if="errorMessage"
+          class="text-red-500 mb-4"
+        >
+          {{ errorMessage }}
+        </p>
+
         <UForm @submit="handleLogin">
           <UFormField label="E-mail">
             <UInput v-model="email" />
@@ -33,6 +40,7 @@
 <script setup>
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('')
 
 const { login } = useAuth()
 
@@ -41,6 +49,11 @@ async function handleLogin() {
     return
   }
 
-  await login(email.value, password.value)
+  errorMessage.value = ''
+
+  try {
+    await login(email.value, password.value)
+  } catch {
+    errorMessage.value = 'Nieprawidłowy e-mail lub hasło.'
+  }
 }
-</script>
