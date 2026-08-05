@@ -15,8 +15,8 @@
       </UBadge>
 
       <UButton
-        color="error"
-        variant="soft"
+        color="neutral"
+        variant="subtle"
         @click="handleLogout"
       >
         Wyloguj
