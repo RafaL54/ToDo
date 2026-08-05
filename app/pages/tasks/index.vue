@@ -56,6 +56,10 @@
 <script setup>
 import TasksHeader from '~/components/TasksHeader.vue'
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const tasks = useState('tasks', () => [])
 
 const { data, pending, error } = await useFetch(
