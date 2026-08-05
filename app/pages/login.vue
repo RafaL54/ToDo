@@ -6,16 +6,15 @@
           Zaloguj się
         </h1>
 
-        <p
-          v-if="errorMessage"
-          class="text-red-500 bg-red-50 border border-red-200 rounded-lg p-3 mb-5 text-sm"
+        <UForm
+          novalidate
+          @submit="handleLogin"
         >
-          {{ errorMessage }}
-        </p>
-
-        <UForm @submit="handleLogin">
           <div class="space-y-5">
-            <UFormField label="E-mail">
+            <UFormField
+              label="E-mail"
+              :error="submitted ? emailError : undefined"
+            >
               <UInput
                 v-model="email"
                 type="email"
@@ -24,7 +23,10 @@
               />
             </UFormField>
 
-            <UFormField label="Hasło">
+            <UFormField
+              label="Hasło"
+              :error="submitted ? passwordError : undefined"
+            >
               <UInput
                 v-model="password"
                 type="password"
@@ -33,11 +35,17 @@
               />
             </UFormField>
 
+            <p
+              v-if="errorMessage"
+              class="text-red-500 bg-red-50 border border-red-200 rounded-lg p-3 text-sm"
+            >
+              {{ errorMessage }}
+            </p>
+
             <UButton
               type="submit"
               block
               size="lg"
-              class="mt-2"
             >
               Zaloguj się
             </UButton>
@@ -55,16 +63,37 @@ definePageMeta({
 
 const email = ref('')
 const password = ref('')
+const emailError = ref('')
+const passwordError = ref('')
 const errorMessage = ref('')
+const submitted = ref(false)
 
 const { login } = useAuth()
 
-async function handleLogin() {
-  if (!email.value.trim() || !password.value.trim()) {
-    return
+function validateForm() {
+  emailError.value = ''
+  passwordError.value = ''
+
+  if (!email.value.trim()) {
+    emailError.value = 'E-mail jest wymagany.'
+  } else if (!email.value.includes('@')) {
+    emailError.value = 'Podaj poprawny adres e-mail.'
   }
 
+  if (!password.value.trim()) {
+    passwordError.value = 'Hasło jest wymagane.'
+  }
+
+  return !emailError.value && !passwordError.value
+}
+
+async function handleLogin() {
+  submitted.value = true
   errorMessage.value = ''
+
+  if (!validateForm()) {
+    return
+  }
 
   try {
     await login(email.value, password.value)
